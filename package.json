@@ -1,0 +1,24 @@
+{
+  "name": "live-interpreter",
+  "version": "0.1.0",
+  "description": "Nghe âm thanh hệ thống, hiện EN + VI và gợi ý trả lời",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "setup:whisper": "powershell -ExecutionPolicy Bypass -File scripts/setup-whisper.ps1",
+    "test": "node scripts/selftest.js && node scripts/uitest.js",
+    "prebuild": "npm test",
+    "build": "node scripts/build.js",
+    "test:py": "F:\\whisper-stt\\venv\\Scripts\\python.exe stt-server/test_speakers.py",
+    "bench:deepgram": "electron scripts/bench-deepgram.js"
+  },
+  "dependencies": {
+    "undici": "^6.29.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^33.2.0",
+    "jsdom": "^29.1.1"
+  }
+}

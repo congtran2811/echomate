@@ -1,0 +1,35 @@
+# Thư viện Node (cài lại bằng npm install)
+node_modules/
+
+# Bản build .exe (tạo lại bằng npm run build)
+dist/
+out/
+
+# Log phiên dùng thật: chứa nội dung hội thoại, bản dịch, gợi ý và file ghi âm WAV — không đưa lên git
+logs/
+
+# Python (sidecar nhận dạng giọng nói)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Model tải về (rất nặng, cài bằng npm run setup:whisper)
+*.onnx
+*.tar.bz2
+
+# Key / biến môi trường (key DeepSeek, Deepgram)
+.env
+.env.*
+
+# Cài đặt cá nhân của Claude Code (giữ lại phần dùng chung trong .claude/ nếu có)
+.claude/settings.local.json
+
+# Rác của hệ điều hành và trình soạn thảo
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.log
+*.tmp

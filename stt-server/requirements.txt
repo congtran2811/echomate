@@ -1,0 +1,6 @@
+faster-whisper>=1.1.0
+websockets>=12.0
+numpy
+nvidia-cublas-cu12
+nvidia-cudnn-cu12==9.*
+sherpa-onnx

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>Live Interpreter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header id="bar">
+    <span id="dot" class="dot"></span>
+    <span id="statusText">Đang khởi động…</span>
+    <span class="spacer"></span>
+    <button id="btnListen" class="primary">▶ Bắt đầu nghe</button>
+    <button id="btnEngine" title="Công cụ nhận dạng: Nemotron trên máy (miễn phí) / Deepgram trên mạng (~0,46 USD/giờ). Bấm để đổi.">💻 Máy</button>
+    <button id="btnMode" title="Chế độ: trò chuyện thật / luyện với gia sư (bấm để đổi)">🗣 Trò chuyện</button>
+    <button id="btnLog" title="Bật ghi log phiên (lưu câu nói, bản dịch, gợi ý, thời gian ra file để kiểm tra)">📝</button>
+    <button id="btnClear" title="Xoá hội thoại">🗑</button>
+    <button id="btnThrough" title="Click xuyên cửa sổ (Ctrl+Alt+T)">👻</button>
+    <button id="btnSettings" title="Cài đặt">⚙</button>
+    <button id="btnMin" title="Thu nhỏ">–</button>
+    <button id="btnClose" title="Đóng">✕</button>
+  </header>
+
+  <div id="banners"></div>
+
+  <main id="feed"><div class="empty">Bấm “Bắt đầu nghe”, chọn <b>Toàn màn hình</b> khi hộp thoại chia sẻ hiện ra. App sẽ nghe âm thanh phát ra từ loa của mọi ứng dụng.</div></main>
+
+  <section id="suggest">
+    <div class="sg-title">Gợi ý trả lời (3 hướng) <span id="usage"></span></div>
+    <div id="sgStatus"></div>
+    <div id="cards"></div>
+  </section>
+
+  <aside id="settings" hidden>
+    <h3>Cài đặt</h3>
+    <label>AI dịch (từng đoạn)
+      <select id="provider"><option value="deepseek">DeepSeek (API)</option><option value="ollama">Ollama (local)</option></select>
+    </label>
+    <label>AI gợi ý trả lời
+      <select id="suggestProvider"><option value="same">Giống phần dịch</option><option value="deepseek">DeepSeek (API)</option><option value="ollama">Ollama (local)</option></select>
+    </label>
+    <label id="rowKey">API key DeepSeek <small id="keyHint"></small>
+      <input id="deepseekKey" type="password" placeholder="sk-…" autocomplete="off" />
+    </label>
+    <label id="rowDsModel">Model DeepSeek
+      <input id="deepseekModel" />
+    </label>
+    <label id="rowOllama">Model Ollama
+      <select id="ollamaModel"></select>
+    </label>
+    <label>Phong cách trả lời
+      <select id="style"><option value="concise">Ngắn gọn</option><option value="polite">Lịch sự</option><option value="casual">Thân mật</option></select>
+    </label>
+    <label>Độ dài gợi ý
+      <select id="replyLength"><option value="short">Ngắn (1 câu ngắn)</option><option value="medium">Vừa (1–2 câu)</option><option value="long">Dài (2–3 câu, có chi tiết)</option></select>
+    </label>
+    <label>Mức tiếng Anh của câu gợi ý
+      <select id="replyLevel"><option value="simple">Đơn giản (câu ngắn, từ thông dụng, dễ đọc to)</option><option value="natural">Tự nhiên (như người bản xứ)</option></select>
+    </label>
+    <label>Vai trò &amp; thông tin về bạn (chỉ ghi DỮ KIỆN: gợi ý chỉ dùng đúng những điều này, không bịa thêm; đừng ghi trình độ tiếng Anh, đã có ô trên)
+      <textarea id="persona" rows="3" placeholder="VD: Tôi là ứng viên vị trí sales executive; người kia là nhà tuyển dụng. Kinh nghiệm: 2 năm bán phần mềm B2B tại công ty X. Thành tích: đạt 120% chỉ tiêu quý 3."></textarea>
+    </label>
+    <label>Chế độ
+      <select id="mode"><option value="chat">Trò chuyện thật (người khác nói với bạn)</option><option value="tutor">Luyện nói với gia sư</option></select>
+    </label>
+    <label>Bối cảnh — chế độ trò chuyện
+      <textarea id="contextChat" rows="2" placeholder="VD: phỏng vấn xin việc lập trình viên; họp với khách hàng Mỹ; gọi món ở quán…"></textarea>
+    </label>
+    <label>Bối cảnh — chế độ gia sư
+      <textarea id="context" rows="2" placeholder="VD: Buổi luyện nói tiếng Anh với gia sư AI: gia sư sửa câu của tôi, hỏi câu mới (Question N)…"></textarea>
+    </label>
+    <label>Tên riêng / thuật ngữ (cách nhau dấu phẩy)
+      <textarea id="glossary" rows="2" placeholder="VD: Acme Corp, Kubernetes, Nguyen Van A"></textarea>
+    </label>
+    <label>Công cụ nhận dạng giọng nói
+      <select id="sttEngine"><option value="whisper">Whisper (GPU, chính xác nhất)</option><option value="nemotron">Nemotron streaming (CPU, chữ ra liên tục; thử nghiệm)</option><option value="deepgram">Deepgram Flux (trên mạng, tự biết hết lượt; tốn phí)</option></select>
+    </label>
+    <label id="rowDgKey">API key Deepgram <small id="dgKeyHint"></small>
+      <input id="deepgramKey" type="password" placeholder="Dán key Deepgram" autocomplete="off" />
+    </label>
+    <label class="row"><input id="micEnabled" type="checkbox" /> Nghe cả micro của tôi (lời tôi nói hiện là "Tôi" và giúp gợi ý sau bám theo; nên dùng tai nghe)</label>
+    <label>Nhận dạng giọng của tôi bằng
+      <select id="micEngine"><option value="whisper">Whisper (đúng giọng tôi hơn, thêm ~1,5 GB VRAM)</option><option value="same">Giống công cụ chính</option></select>
+    </label>
+    <label>Thư mục model Nemotron
+      <input id="nemotronDir" />
+    </label>
+    <label>Thiết bị Whisper
+      <select id="whisperDevice"><option value="cuda">GPU (CUDA)</option><option value="cpu">CPU</option></select>
+    </label>
+    <label>Model Whisper
+      <input id="whisperModel" />
+    </label>
+    <label>Thư mục Whisper
+      <input id="whisperDir" />
+    </label>
+    <label class="row"><input id="interim" type="checkbox" /> Hiện chữ tạm khi đang nói (tốn GPU hơn)</label>
+    <label class="row"><input id="diarize" type="checkbox" /> Nhiều người nói: tách giọng, gán nhãn A, B, C… (thử nghiệm; bấm vào nhãn để đánh dấu "đây là tôi")</label>
+    <label>Ngưỡng nhận ra cùng một người (0,2–0,8; cao hơn = dễ tách thành người mới)
+      <input id="speakerThreshold" type="number" min="0.2" max="0.8" step="0.02" />
+    </label>
+    <label class="row"><input id="localDraft" type="checkbox" /> Hiện bản dịch nháp từ model local trước, DeepSeek sửa lại sau (nhanh hơn ~0,8 s; cần ~3 GB VRAM)</label>
+    <label class="row"><input id="logAudio" type="checkbox" /> Khi ghi log: lưu cả âm thanh (WAV) từng đoạn</label>
+    <div class="actions"><button id="btnOpenLogs">Mở thư mục log</button></div>
+    <label>Im lặng bao lâu thì chốt câu (ms)
+      <input id="silenceMs" type="number" min="300" max="2000" step="50" />
+    </label>
+    <label>Im lặng bao lâu thì coi là hết lượt nói, bắt đầu gợi ý (ms)
+      <input id="turnEndMs" type="number" min="800" max="5000" step="100" />
+    </label>
+    <label>Ngưỡng âm thanh (thấp = nhạy hơn)
+      <input id="vadThreshold" type="number" min="0.001" max="0.1" step="0.001" />
+    </label>
+    <label>Độ trong suốt cửa sổ
+      <input id="opacity" type="range" min="0.4" max="1" step="0.05" />
+    </label>
+    <div class="actions"><button id="btnSave" class="primary">Lưu</button><button id="btnCancel">Đóng</button></div>
+  </aside>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
